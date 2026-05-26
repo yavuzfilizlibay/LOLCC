@@ -2,7 +2,7 @@
   "name": "lolcc-extension",
   "displayName": "LOLCC - Local LLM Control Center",
   "description": "Yavuz-Ryzen AMD + HpServer + Yavuz-Arn-Home GPU compute için Türkçe AI assistant",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "publisher": "yavuz-lolcc",
   "engines": {
     "vscode": "^1.85.0"

@@ -1,18 +1,27 @@
 /**
- * Chat WebView Provider — sidebar chat panel.
- * Streaming destekli: token geldikçe UI'ya post mesaj.
+ * Chat WebView Provider — v0.2 ile agent loop entegrasyonu.
+ *
+ * Mode toggle:
+ *   - "chat"  → plain chat (single response, no tools)
+ *   - "agent" → Cline-like multi-step (tool use loop)
+ *
+ * UI'da kullanıcı görev gönderdiğinde mode'a göre AgentLoop veya plain stream.
  */
 const vscode = require("vscode");
 const fs = require("fs");
 const path = require("path");
+const { AgentLoop } = require("./agent-loop");
 
 class ChatViewProvider {
   constructor(extensionUri, apiClient, configFn) {
     this.extensionUri = extensionUri;
     this.apiClient = apiClient;
     this.configFn = configFn;
-    this.messages = []; // chat history
     this.view = null;
+    this.cancelled = false;
+    this.mode = "chat"; // 'chat' or 'agent'
+    this.autoApprove = false;
+    this.agent = null;
   }
 
   resolveWebviewView(webviewView, _context, _token) {
@@ -29,12 +38,21 @@ class ChatViewProvider {
           await this.#handleUserMessage(msg.content);
           break;
         case "clear":
-          this.messages = [];
+          this.#getAgent().clearHistory();
           this.#post({ type: "cleared" });
           break;
-        case "modelSelect":
-          await vscode.workspace.getConfiguration("lolcc").update("chatModel", msg.model, true);
-          this.#post({ type: "info", text: `Model: ${msg.model}` });
+        case "cancel":
+          this.cancelled = true;
+          break;
+        case "setMode":
+          this.mode = msg.mode === "agent" ? "agent" : "chat";
+          this.#post({ type: "info", text: `Mod: ${this.mode === "agent" ? "🤖 Agent (tool kullanır)" : "💬 Chat (tek cevap)"}` });
+          // Mode değişince history reset
+          this.#getAgent().clearHistory();
+          break;
+        case "setAutoApprove":
+          this.autoApprove = !!msg.value;
+          this.#post({ type: "info", text: `Auto-approve: ${this.autoApprove ? "açık (read-only tool'lar)" : "kapalı"}` });
           break;
       }
     });
@@ -43,7 +61,6 @@ class ChatViewProvider {
   async postUserMessage(content, label) {
     if (!this.view) {
       await vscode.commands.executeCommand("workbench.view.extension.lolcc-sidebar");
-      // wait a tick for view to init
       await new Promise((r) => setTimeout(r, 200));
     }
     if (this.view) {
@@ -53,27 +70,24 @@ class ChatViewProvider {
   }
 
   async #handleUserMessage(content) {
-    this.messages.push({ role: "user", content });
-    this.#post({ type: "assistantStart" });
-    let assistantContent = "";
+    this.cancelled = false;
+    const agent = this.#getAgent();
+    try {
+      await agent.run(content, { mode: this.mode, autoApprove: this.autoApprove });
+    } catch (e) {
+      this.#post({ type: "error", text: "Hata: " + e.message });
+    }
+  }
 
-    await this.apiClient.chatStream(this.messages, (chunk) => {
-      if (chunk.error) {
-        this.#post({ type: "error", text: chunk.error });
-        return;
-      }
-      if (chunk.content) {
-        assistantContent += chunk.content;
-        this.#post({ type: "assistantToken", text: chunk.content });
-      }
-      if (chunk.reasoning) {
-        this.#post({ type: "reasoningToken", text: chunk.reasoning });
-      }
-      if (chunk.done) {
-        this.messages.push({ role: "assistant", content: assistantContent });
-        this.#post({ type: "assistantEnd" });
-      }
-    });
+  #getAgent() {
+    if (!this.agent) {
+      this.agent = new AgentLoop(
+        this.apiClient,
+        (msg) => this.#post(msg),
+        () => this.cancelled
+      );
+    }
+    return this.agent;
   }
 
   #post(msg) {

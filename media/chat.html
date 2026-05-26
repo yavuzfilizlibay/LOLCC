@@ -10,14 +10,22 @@
   <header>
     <div class="title">LOLCC <span class="model">{{chatModel}}</span></div>
     <div class="actions">
-      <button id="clearBtn" title="Konuşmayı temizle">🗑</button>
+      <select id="modeSelect" title="Mod">
+        <option value="chat">💬 Chat</option>
+        <option value="agent">🤖 Agent</option>
+      </select>
+      <label class="approve-label" title="Read-only tool'lar otomatik onayla">
+        <input type="checkbox" id="autoApprove" /> Auto
+      </label>
+      <button id="cancelBtn" title="İptal" style="display: none;">⏹</button>
+      <button id="clearBtn" title="Temizle">🗑</button>
     </div>
   </header>
 
   <main id="messages"></main>
 
   <footer>
-    <textarea id="input" placeholder="Mesajını yaz... (Enter gönder, Shift+Enter yeni satır)" rows="2"></textarea>
+    <textarea id="input" placeholder="Görev yaz... (Enter gönder, Shift+Enter yeni satır)" rows="2"></textarea>
     <button id="sendBtn">Gönder</button>
   </footer>
 

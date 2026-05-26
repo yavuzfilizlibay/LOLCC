@@ -21,6 +21,7 @@ header {
 }
 header .title { font-weight: 600; font-size: 13px; }
 header .model { font-size: 11px; opacity: 0.7; margin-left: 4px; font-family: var(--vscode-editor-font-family); }
+header .actions { display: flex; gap: 6px; align-items: center; }
 header .actions button {
   background: transparent;
   border: 0;
@@ -31,6 +32,23 @@ header .actions button {
   border-radius: 3px;
 }
 header .actions button:hover { background: var(--vscode-list-hoverBackground); }
+header .actions select {
+  background: var(--vscode-dropdown-background);
+  color: var(--vscode-dropdown-foreground);
+  border: 1px solid var(--vscode-dropdown-border);
+  padding: 3px 6px;
+  font-size: 11px;
+  border-radius: 3px;
+}
+header .actions .approve-label {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 10px;
+  opacity: 0.8;
+  user-select: none;
+}
+header .actions .approve-label input { margin: 0; }
 
 main {
   flex: 1;
@@ -99,6 +117,53 @@ main {
   text-transform: uppercase;
   font-size: 9px;
   opacity: 0.8;
+}
+
+.bubble.tool-call {
+  align-self: stretch;
+  background: var(--vscode-editorWidget-background);
+  border: 1px solid var(--vscode-panel-border);
+  border-left: 3px solid var(--vscode-charts-blue);
+  padding: 6px 8px;
+  font-size: 12px;
+}
+.bubble.tool-call.tool-ok { border-left-color: var(--vscode-charts-green); }
+.bubble.tool-call.tool-err { border-left-color: var(--vscode-charts-red); }
+.tool-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.tool-icon { font-size: 13px; }
+.tool-name { font-family: var(--vscode-editor-font-family); color: var(--vscode-charts-blue); }
+.tool-status { margin-left: auto; font-size: 10px; opacity: 0.8; font-weight: normal; }
+.tool-body pre, .tool-output pre {
+  margin: 0;
+  padding: 4px 6px;
+  background: var(--vscode-textCodeBlock-background);
+  border-radius: 2px;
+  font-size: 11px;
+  max-height: 250px;
+  overflow: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+.tool-output { margin-top: 4px; }
+
+.bubble.completion {
+  align-self: stretch;
+  background: var(--vscode-editorInfo-background);
+  border: 1px solid var(--vscode-charts-green);
+  border-radius: 6px;
+  padding: 8px 10px;
+}
+.bubble.completion .label {
+  font-size: 10px;
+  color: var(--vscode-charts-green);
+  font-weight: 600;
+  margin-bottom: 4px;
 }
 
 .bubble code, .bubble pre {
