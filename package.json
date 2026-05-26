@@ -2,7 +2,7 @@
   "name": "lolcc-extension",
   "displayName": "LOLCC - Local LLM Control Center",
   "description": "Yavuz-Ryzen AMD + HpServer + Yavuz-Arn-Home GPU compute için Türkçe AI assistant",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "publisher": "yavuz-lolcc",
   "engines": {
     "vscode": "^1.85.0"
@@ -93,8 +93,16 @@
         },
         "lolcc.chatModel": {
           "type": "string",
-          "default": "qwen3-coder-30b",
-          "description": "Chat için model ID (LiteLLM model_group ismi)"
+          "default": "qwen3.5-4b-balanced",
+          "enum": [
+            "qwen3.5-4b-balanced",
+            "phi-4-balanced",
+            "qwen3-coder-30b",
+            "qwen3-30b",
+            "qwopus-reasoning",
+            "hpserver-qwen4b"
+          ],
+          "description": "Chat için model ID. Default balanced (AMD+Nvidia round-robin, hızlı). qwen3-coder-30b = AMD only, manuel load gerekir."
         },
         "lolcc.autocompleteModel": {
           "type": "string",
