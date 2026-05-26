@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+  <!-- L brain stylized: 3 dots (3 PC) + L shape -->
+  <circle cx="6" cy="5" r="1.6" fill="#22c55e"/>
+  <circle cx="12" cy="5" r="1.6" fill="#3b82f6"/>
+  <circle cx="18" cy="5" r="1.6" fill="#a855f7"/>
+  <path d="M4 9 h2 v9 h6 v2 H4 z" />
+  <text x="14" y="20" font-family="monospace" font-size="7" font-weight="bold" fill="currentColor">LLM</text>
+</svg>

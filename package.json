@@ -1,0 +1,134 @@
+{
+  "name": "lolcc-extension",
+  "displayName": "LOLCC - Local LLM Control Center",
+  "description": "Yavuz-Ryzen AMD + HpServer + Yavuz-Arn-Home GPU compute için Türkçe AI assistant",
+  "version": "0.1.0",
+  "publisher": "yavuz-lolcc",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "AI",
+    "Machine Learning",
+    "Other"
+  ],
+  "keywords": [
+    "lolcc",
+    "local-llm",
+    "lm-studio",
+    "ai",
+    "turkish"
+  ],
+  "main": "./extension.js",
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "lolcc.openChat",
+        "title": "LOLCC: Chat Paneli Aç",
+        "category": "LOLCC"
+      },
+      {
+        "command": "lolcc.explainSelection",
+        "title": "LOLCC: Seçili Kodu Açıkla",
+        "category": "LOLCC"
+      },
+      {
+        "command": "lolcc.refactorSelection",
+        "title": "LOLCC: Refactor Öner",
+        "category": "LOLCC"
+      },
+      {
+        "command": "lolcc.healthCheck",
+        "title": "LOLCC: PC Sağlık Kontrolü",
+        "category": "LOLCC"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "lolcc.explainSelection",
+          "when": "editorHasSelection",
+          "group": "lolcc@1"
+        },
+        {
+          "command": "lolcc.refactorSelection",
+          "when": "editorHasSelection",
+          "group": "lolcc@2"
+        }
+      ]
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "lolcc-sidebar",
+          "title": "LOLCC",
+          "icon": "media/lolcc-icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "lolcc-sidebar": [
+        {
+          "id": "lolcc.chatView",
+          "name": "Chat",
+          "type": "webview"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "LOLCC",
+      "properties": {
+        "lolcc.apiBase": {
+          "type": "string",
+          "default": "http://localhost:4000/v1",
+          "description": "LiteLLM proxy URL (önerilen) veya direkt LM Studio endpoint"
+        },
+        "lolcc.apiKey": {
+          "type": "string",
+          "default": "sk-lolcc-proxy-2026",
+          "description": "API key (LiteLLM master key veya lm-studio)"
+        },
+        "lolcc.chatModel": {
+          "type": "string",
+          "default": "qwen3-coder-30b",
+          "description": "Chat için model ID (LiteLLM model_group ismi)"
+        },
+        "lolcc.autocompleteModel": {
+          "type": "string",
+          "default": "qwen3.5-4b-balanced",
+          "description": "Inline autocomplete (Tab) için hızlı model"
+        },
+        "lolcc.autocompleteEnabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Tab autocomplete (FIM) açık mı"
+        },
+        "lolcc.systemPrompt": {
+          "type": "string",
+          "default": "Sen Türkçe konuşan kıdemli bir geliştiricisin. Kısa, öz, kod örnekli cevap ver.",
+          "description": "Chat için system prompt (hafif tutuldu, LM Studio crash önler)"
+        },
+        "lolcc.maxTokens": {
+          "type": "number",
+          "default": 2000,
+          "description": "Cevap için max token (reasoning model'ler 1500+ ister)"
+        },
+        "lolcc.dashboardUrl": {
+          "type": "string",
+          "default": "http://localhost:8090",
+          "description": "Control Center FastAPI URL — status bar info için"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "package": "vsce package --no-dependencies --skip-license"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.85.0",
+    "@vscode/vsce": "^2.32.0"
+  }
+}
