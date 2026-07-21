@@ -12,10 +12,12 @@ const { ApiClient } = require("./src/api-client");
 const { ChatViewProvider } = require("./src/chat-panel");
 const { LolccCompletionProvider } = require("./src/completion");
 const { StatusBar } = require("./src/status-bar");
+const { RemoteControl } = require("./src/remote-control");
 
 let apiClient;
 let statusBar;
 let chatProvider;
+let remoteControl;
 
 function activate(context) {
   const config = () => vscode.workspace.getConfiguration("lolcc");
@@ -23,6 +25,7 @@ function activate(context) {
   apiClient = new ApiClient(config);
   statusBar = new StatusBar(apiClient, config);
   chatProvider = new ChatViewProvider(context.extensionUri, apiClient, config);
+  remoteControl = new RemoteControl(apiClient, config);
 
   // --- WebView (sidebar chat) ---
   context.subscriptions.push(
@@ -60,6 +63,9 @@ function activate(context) {
     }),
     vscode.commands.registerCommand("lolcc.healthCheck", async () => {
       await statusBar.runHealthCheck(true);
+    }),
+    vscode.commands.registerCommand("lolcc.remoteControl", async () => {
+      await remoteControl.run();
     })
   );
 

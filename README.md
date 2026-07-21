@@ -7,6 +7,7 @@ Yavuz-Ryzen AMD + HpServer + Yavuz-Arn-Home GPU compute için Türkçe AI assist
 - 💬 **Chat Panel** (sidebar) — streaming response, kod blokları, reasoning gösterimi
 - ⚡ **Inline Completion** (Tab autocomplete) — FIM (Fill-in-the-Middle) Qwen3.5-4B üzerinden
 - 📊 **Status Bar** — 3 PC online durumu + AMD GPU °C, tıklayınca detay
+- 🎮 **Uzaktan Kontrol** — VS Code içinden PC seç → model yükle/değiştir, daemon restart, güç işlemleri (bkz. [REMOTE_CONTROL.md](REMOTE_CONTROL.md))
 - 🎯 **Context menu**: seçili kodu açıkla / refactor et
 - 🛡 **AMD daemon fragile değil**: LiteLLM proxy üzerinden fallback chain (HpServer CPU otomatik)
 - 🇹🇷 Türkçe UI ve sistem prompt
@@ -24,6 +25,9 @@ VS Code Settings → "lolcc" ara:
 | `lolcc.systemPrompt` | (hafif Türkçe) | ~100 token, AMD crash önler |
 | `lolcc.maxTokens` | 2000 | Reasoning + content için yeter |
 | `lolcc.dashboardUrl` | `http://localhost:8090` | Control Center URL |
+| `lolcc.dashboardApiKey` | `` (boş) | Control Center opsiyonel Bearer key |
+| `lolcc.powerActionsEnabled` | `false` | Uzaktan kontrolde güç işlemleri (WoL/reboot/shutdown) |
+| `lolcc.controlEndpoints` | `{}` | Uzaktan kontrol endpoint override'ları |
 
 ## Komutlar
 
@@ -31,6 +35,7 @@ VS Code Settings → "lolcc" ara:
 - `LOLCC: Seçili Kodu Açıkla` (Editor right-click)
 - `LOLCC: Refactor Öner` (Editor right-click)
 - `LOLCC: PC Sağlık Kontrolü` (status bar tıkla)
+- `LOLCC: Uzaktan Kontrol` (PC seç → model/daemon/güç aksiyonu)
 
 ## Kullanım
 
