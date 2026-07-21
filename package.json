@@ -44,6 +44,11 @@
         "command": "lolcc.healthCheck",
         "title": "LOLCC: PC Sağlık Kontrolü",
         "category": "LOLCC"
+      },
+      {
+        "command": "lolcc.remoteControl",
+        "title": "LOLCC: Uzaktan Kontrol",
+        "category": "LOLCC"
       }
     ],
     "menus": {
@@ -127,7 +132,30 @@
         "lolcc.dashboardUrl": {
           "type": "string",
           "default": "http://localhost:8090",
-          "description": "Control Center FastAPI URL — status bar info için"
+          "description": "Control Center FastAPI URL — status bar info ve uzaktan kontrol için"
+        },
+        "lolcc.dashboardApiKey": {
+          "type": "string",
+          "default": "",
+          "description": "Control Center için opsiyonel API key (Authorization: Bearer). Boşsa header gönderilmez."
+        },
+        "lolcc.powerActionsEnabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Uzaktan kontrolde güç işlemlerini (Wake-on-LAN / reboot / shutdown) göster. Güvenlik için varsayılan kapalı."
+        },
+        "lolcc.controlEndpoints": {
+          "type": "object",
+          "default": {},
+          "description": "Uzaktan kontrol aksiyonları için endpoint yolu override'ları. Anahtarlar: model.load, model.unload, daemon.restart, power.wake, power.reboot, power.shutdown. Boş bırakılan default'u kullanır.",
+          "properties": {
+            "model.load": { "type": "string" },
+            "model.unload": { "type": "string" },
+            "daemon.restart": { "type": "string" },
+            "power.wake": { "type": "string" },
+            "power.reboot": { "type": "string" },
+            "power.shutdown": { "type": "string" }
+          }
         }
       }
     }

@@ -29,6 +29,12 @@ class ApiClient {
   maxTokens() {
     return this.configFn().get("maxTokens");
   }
+  dashboardBase() {
+    return this.configFn().get("dashboardUrl").replace(/\/$/, "");
+  }
+  dashboardKey() {
+    return this.configFn().get("dashboardApiKey") || "";
+  }
 
   /**
    * Non-streaming chat completion.
@@ -185,14 +191,69 @@ class ApiClient {
    * Her PC'nin online durumu + amd_gpu_temp döner.
    */
   async healthCheck() {
-    const dashboardUrl = this.configFn().get("dashboardUrl").replace(/\/$/, "");
     try {
-      const resp = await fetch(`${dashboardUrl}/api/pcs`, { signal: AbortSignal.timeout(3000) });
+      const resp = await fetch(`${this.dashboardBase()}/api/pcs`, {
+        headers: this.#dashboardHeaders(),
+        signal: AbortSignal.timeout(3000),
+      });
       if (!resp.ok) return null;
       return await resp.json();
     } catch (_e) {
       return null;
     }
+  }
+
+  /**
+   * Remote-control aksiyonu — Control Center FastAPI'ye POST.
+   *
+   * Sözleşme (backend'in expose etmesi gereken):
+   *   POST {dashboardUrl}{path}  body: JSON
+   *   200 → { ok: true, message?: string }   (ok yoksa 200'ü başarı sayarız)
+   *   4xx/5xx → { ok: false, error?: string } veya düz metin
+   *
+   * @param {string} path  örn "/api/model/load"
+   * @param {object} payload  gövde (örn { pc, model })
+   * @param {object} [opts]  { timeoutMs }
+   * @returns {Promise<{ ok: boolean, message?: string, error?: string, status?: number }>}
+   */
+  async control(path, payload = {}, opts = {}) {
+    const url = `${this.dashboardBase()}${path}`;
+    const timeoutMs = opts.timeoutMs || 15000;
+    try {
+      const resp = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...this.#dashboardHeaders() },
+        body: JSON.stringify(payload),
+        signal: AbortSignal.timeout(timeoutMs),
+      });
+      const raw = await resp.text().catch(() => "");
+      let data = null;
+      try {
+        data = raw ? JSON.parse(raw) : null;
+      } catch (_e) {
+        /* düz metin cevabı — data null kalır */
+      }
+      if (!resp.ok) {
+        return {
+          ok: false,
+          status: resp.status,
+          error: data?.error || data?.message || raw.slice(0, 300) || `HTTP ${resp.status}`,
+        };
+      }
+      // 200 ama backend `ok:false` döndürebilir
+      if (data && data.ok === false) {
+        return { ok: false, status: resp.status, error: data.error || data.message || "İşlem başarısız" };
+      }
+      return { ok: true, status: resp.status, message: data?.message || (raw && !data ? raw.slice(0, 300) : "") };
+    } catch (e) {
+      const msg = e.name === "TimeoutError" || e.name === "AbortError" ? "zaman aşımı" : e.message;
+      return { ok: false, error: msg };
+    }
+  }
+
+  #dashboardHeaders() {
+    const key = this.dashboardKey();
+    return key ? { Authorization: `Bearer ${key}` } : {};
   }
 
   #applySystemPrompt(messages) {
